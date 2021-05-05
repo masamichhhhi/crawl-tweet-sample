@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "crawl-tweet-project\n\n Sample SAM Template for crawl-tweet-project\n"
+Parameters:
+  AwsAccessKey:
+    Type: String
+  AwsSecretAccessKey:
+    Type: String
+  ConsumerKey:
+    Type: String
+  ConsumerSecret:
+    Type: String
+  AccessToken:
+    Type: String
+  AccessTokenSecret:
+    Type: String
+Globals:
+  Function:
+    Timeout: 5
+Resources:
+  CrawlTweetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://clubes-crawltweet/cd4f555f7340cd50fb7b559026dbe166
+      Handler: crawl-tweet
+      Runtime: go1.x
+      Tracing: Active
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0/5 * * * ? *)
+      Environment:
+        Variables:
+          AWS_ACCEESS_KEY:
+            Ref: AwsAccessKey
+          AWS_SECRET_ACCEESS_KEY:
+            Ref: AwsSecretAccessKey
+          CONSUMER_KEY:
+            Ref: ConsumerKey
+          CONSUMER_SECRET:
+            Ref: ConsumerSecret
+          ACCESS_TOKEN:
+            Ref: AccessToken
+          ACCESS_TOKEN_SECRET:
+            Ref: AccessTokenSecret

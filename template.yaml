@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  crawl-tweet-project
+
+   Sample SAM Template for crawl-tweet-project
+
+# 渡したいパラメータ名と型を指定
+Parameters:
+  AwsAccessKey:
+    Type: String
+  AwsSecretAccessKey:
+    Type: String
+  ConsumerKey:
+    Type: String
+  ConsumerSecret:
+    Type: String
+  AccessToken:
+    Type: String
+  AccessTokenSecret:
+    Type: String
+
+Globals:
+  Function:
+    Timeout: 5
+
+Resources:
+  CrawlTweetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      # 関数がある場所を指定
+      CodeUri: crawl-tweet/
+      Handler: crawl-tweet
+      Runtime: go1.x
+      Tracing: Active
+      # EventsはScheduledEventに変える
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0/5 * * * ? *)
+      # 上のParameterでもらった値を環境変数にセット
+      Environment:
+        Variables:
+          AWS_ACCEESS_KEY: !Ref AwsAccessKey
+          AWS_SECRET_ACCEESS_KEY: !Ref AwsSecretAccessKey
+          CONSUMER_KEY: !Ref ConsumerKey
+          CONSUMER_SECRET: !Ref ConsumerSecret
+          ACCESS_TOKEN: !Ref AccessToken
+          ACCESS_TOKEN_SECRET: !Ref AccessTokenSecret
+Outputs:
+  CrawlTweetFunction:
+    Description: "Crawling Tweet Function ARN"
+    Value: !GetAtt CrawlTweetFunction.Arn
+  CrawlTweetFunctionIamRole:
+    Description: "Implicit IAM Role created for Crawl Tweet Function"
+    Value: !GetAtt CrawlTweetFunctionRole.Arn
